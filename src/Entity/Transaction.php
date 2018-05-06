@@ -35,7 +35,7 @@ class Transaction
         $this->account = $account;
     }
 
-    public function getId(): UuidInterface
+    public function getId(): int
     {
         return $this->id;
     }

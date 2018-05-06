@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Demo</h1>
+
+    <div id="demo"></div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {% set endpoints = [
+    {'path': path('api_account_list'), 'name': 'Account List', 'method': 'GET'},
+    {'path': path('api_account_add'), 'name': 'Account List', 'method': 'POST', 'body': {'name': 'string'}},
+    {'path': path('api_transaction_list'), 'name': 'Transaction List', 'method': 'GET'},
+    ] %}
+    <script type="text/javascript">
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var endpoints = {{ endpoints|json_encode|raw }}
+        console.log(endpoints)
+
+        var demo = document.querySelector('#demo');
+
+        for (var endpoint of endpoints) {
+            if (endpoint.method = 'GET') {
+                demo.appendChild(createGetEndpoint(endpoint));
+            }
+            if (endpoint.method = 'POST') {
+                demo.appendChild(createPostEndpoint(endpoint));
+            }
+        }
+
+        function createPostEndpoint(endpoint) {
+            var result = document.createElement('div');
+            result.classList.add('result');
+
+            var textarea = document.createElement('textarea');
+
+            var button = document.createElement('button');
+            button.href = endpoint.path;
+            button.appendChild(document.createTextNode(endpoint.name));
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                var r = new XMLHttpRequest();
+                r.open("POST", button.href, true);
+                r.onreadystatechange = function () {
+                    if (r.readyState != 4 || r.status != 200) return;
+                    result.textContent = r.responseText;
+                };
+                r.send(textarea.value);
+            });
+
+
+
+
+
+
+
+            var endpointContainer = document.createElement('div');
+            endpointContainer.classList.add('endpoint');
+            endpointContainer.appendChild(button);
+            endpointContainer.appendChild(textarea);
+            endpointContainer.appendChild(result);
+
+            return endpointContainer;
+        }
+
+        function createGetEndpoint(endpoint) {
+            var result = document.createElement('div');
+            result.classList.add('result');
+
+
+            var link = document.createElement('a');
+            link.href = endpoint.path;
+            link.appendChild(document.createTextNode(endpoint.name));
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                var r = new XMLHttpRequest();
+                r.open("GET", link.href, true);
+                r.onreadystatechange = function () {
+                    if (r.readyState != 4 || r.status != 200) return;
+                    result.textContent = r.responseText;
+                };
+                r.send();
+            });
+
+
+
+
+
+            var endpointContainer = document.createElement('div');
+            endpointContainer.classList.add('endpoint');
+            endpointContainer.appendChild(link);
+            endpointContainer.appendChild(result);
+
+            return endpointContainer;
+        }
+    });
+    </script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .result {
+        border: 1px solid black;
+        font-family: monospace, monospace;
+    }
+</style>
+{% endblock %}

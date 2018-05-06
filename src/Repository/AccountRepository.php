@@ -22,7 +22,7 @@ class AccountRepository
         return $this->getRepository()->findAll();
     }
 
-    public function findById(string $id): Account
+    public function findById(int $id): Account
     {
         return  $this->getRepository()->find($id);
     }

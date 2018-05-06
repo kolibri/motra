@@ -4,9 +4,8 @@ namespace Tests\App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DomCrawler\Crawler;
 
-class HomeControllerTest extends WebTestCase
+class FrontendControllerTest extends WebTestCase
 {
     /** @var Client */
     private $client;
@@ -22,10 +21,7 @@ class HomeControllerTest extends WebTestCase
         $this->client->followRedirect();
 
         $this->createAccount('bar');
-
         $this->assertTotalAmount(0);
-
-
         $this->doTransaction(100, 'income', 'save', '1');
         $this->assertTotalAmount(100);
         $this->doTransaction(2.5, 'something', 'spend', '1');
@@ -48,12 +44,15 @@ class HomeControllerTest extends WebTestCase
         $this->assertCount(1, $formTag);
 
         $form = $formTag->selectButton('transaction.form.button')->form();
-        $this->client->submit($form, [
-            'transaction[amount]' => number_format($amount, 2, ',', '.'),
-            'transaction[title]' => $title,
-            'transaction[type]' => $type,
-            'transaction[account]' => $account,
-        ]);
+        $this->client->submit(
+            $form,
+            [
+                'transaction[amount]' => number_format($amount, 2, ',', '.'),
+                'transaction[title]' => $title,
+                'transaction[type]' => $type,
+                'transaction[account]' => $account,
+            ]
+        );
 
         $this->assertTrue($this->client->getResponse()->isRedirection());
 

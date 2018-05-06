@@ -25,6 +25,12 @@ class FrontendController extends Controller
 
         return $this->render('home.html.twig', ['accounts' => $repository->findAll()]);
     }
+
+    /** @Route("/demo", name="demo") */
+    public function demo()
+    {
+        return $this->render('demo.html.twig');
+    }
     
     /** @Route("/account/create", name="account_create") */
     public function createAccount(Request $request, AccountFormHandler $formHandler): Response

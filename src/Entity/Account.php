@@ -23,7 +23,7 @@ class Account
         $this->name = $name;
     }
 
-    public function getId(): UuidInterface
+    public function getId(): int
     {
         return $this->id;
     }

@@ -38,6 +38,12 @@ class TransactionRepository
         $flush && $this->entityManager->flush();
     }
 
+    public function delete(Transaction $transaction, bool $flush = true)
+    {
+        $this->entityManager->remove($transaction);
+        $flush && $this->entityManager->flush();
+    }
+
     private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(Transaction::class);
