@@ -17,47 +17,58 @@ class HomeControllerTest extends WebTestCase
         $this->client->followRedirects(false);
 
         $this->client->request('GET', '/');
-        $this->assertTrue($this->client->getResponse()->isSuccessful());
+
+        $this->assertTrue($this->client->getResponse()->isRedirection());
+        $this->client->followRedirect();
+
+        $this->createAccount('bar');
 
         $this->assertTotalAmount(0);
-        $this->save(100);
+
+
+        $this->doTransaction(100, 'income', 'save', '1');
         $this->assertTotalAmount(100);
-        $this->spend(2.5);
+        $this->doTransaction(2.5, 'something', 'spend', '1');
         $this->assertTotalAmount(97.5);
     }
 
     private function assertTotalAmount(float $amount)
     {
         $crawler = $this->client->getCrawler();
-        $amountTag = $crawler->filter('#total_amount');
+        $amountTag = $crawler->filter('.total_amount');
         $this->assertCount(1, $amountTag);
         $this->assertEquals(number_format($amount, 2, ',', '.'), trim($amountTag->text()));
     }
 
-    private function save(float $amount)
+    private function doTransaction(float $amount, string $title, string $type, string $account)
     {
         $crawler = $this->client->getCrawler();
-        $formTag = $crawler->filter('form[name=save_money]');
+        $formTag = $crawler->filter('form[name=transaction]');
 
         $this->assertCount(1, $formTag);
 
-        $form = $formTag->selectButton('Save')->form();
-        $this->client->submit($form, ['save_money[amount]' => number_format($amount, 2, ',', '.')]);
+        $form = $formTag->selectButton('transaction.form.button')->form();
+        $this->client->submit($form, [
+            'transaction[amount]' => number_format($amount, 2, ',', '.'),
+            'transaction[title]' => $title,
+            'transaction[type]' => $type,
+            'transaction[account]' => $account,
+        ]);
 
         $this->assertTrue($this->client->getResponse()->isRedirection());
 
         return $this->client->followRedirect();
     }
 
-    private function spend(float $amount)
+    private function createAccount(string $name)
     {
         $crawler = $this->client->getCrawler();
-        $formTag = $crawler->filter('form[name=spend_money]');
+        $formTag = $crawler->filter('form[name=account]');
 
         $this->assertCount(1, $formTag);
 
-        $form = $formTag->selectButton('Spend')->form();
-        $this->client->submit($form, ['spend_money[amount]' => number_format($amount, 2, ',', '.')]);
+        $form = $formTag->selectButton('Create Account')->form();
+        $this->client->submit($form, ['account[name]' => $name]);
 
         $this->assertTrue($this->client->getResponse()->isRedirection());
 

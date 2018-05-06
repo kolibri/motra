@@ -2,37 +2,39 @@
 
 namespace App\Repository;
 
+use App\Entity\Account;
 use App\Entity\Transaction;
-use App\Transaction\TransactionConverter;
-use App\Transaction\TransactionInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
 class TransactionRepository
 {
     private $entityManager;
-    private $converter;
 
-    public function __construct(EntityManagerInterface $entityManager, TransactionConverter $converter)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->converter = $converter;
     }
 
-    /** @return TransactionInterface[] */
-    public function getAll(): array
+    /** @return Transaction[] */
+    public function findAll(): array
     {
-        return array_map(
-            function (Transaction $transaction) {
-                return $this->converter->fromEntity($transaction);
-            },
-            $this->getRepository()->findAll()
-        );
+        return $this->getRepository()->findAll();
     }
 
-    public function add(TransactionInterface $transaction, bool $flush = true)
+    /** @return Transaction[] */
+    public function findAllByAccount(Account $account)
     {
-        $this->entityManager->persist($this->converter->toEntity($transaction));
+        return $this->getRepository()->createQueryBuilder('t')
+            ->where('t.account = :account')
+            ->setParameter('account', $account)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function add(Transaction $transaction, bool $flush = true)
+    {
+        $this->entityManager->persist($transaction);
         $flush && $this->entityManager->flush();
     }
 

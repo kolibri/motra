@@ -8,30 +8,31 @@ use Ramsey\Uuid\UuidInterface;
 /** @ORM\Entity() */
 class Transaction
 {
+    const TYPE_SAVE = 'save';
+    const TYPE_SPEND = 'spend';
+
     /**
-     * @ORM\Id()
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class="Ramsey\Uuid\Doctrine\UuidGenerator")
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
      */
     private $id;
+    /** @ORM\ManyToOne(targetEntity="Account") */
+    private $account;
     /** @ORM\Column() */
     private $title;
     /** @ORM\Column() */
     private $type;
+
     /** @ORM\Column(type="integer") */
     private $amount;
 
-    public function __construct(string $title, int $total, string $type)
+    public function __construct(string $title, int $amount, string $type, Account $account)
     {
         $this->title = $title;
-        $this->amount = $total;
-        $this->type = $type;
-    }
-
-    public function setAmount(int $amount)
-    {
         $this->amount = $amount;
+        $this->type = $type;
+        $this->account = $account;
     }
 
     public function getId(): UuidInterface
@@ -52,5 +53,10 @@ class Transaction
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getAccount(): Account
+    {
+        return $this->account;
     }
 }

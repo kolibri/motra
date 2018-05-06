@@ -2,8 +2,10 @@
 
 namespace App\Transaction\Form;
 
-class SaveMoneyData
+class TransactionData
 {
     public $amount;
     public $title;
+    public $type;
+    public $account;
 }

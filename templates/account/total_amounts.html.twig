@@ -1,0 +1,8 @@
+<span id="total_amount">
+    <dl>
+    {% for account in accounts %}
+        <dt>{{ account.name }}</dt>
+        <dl class="total_amount"> {{ (account.total/100)|number_format(2, ',', '.') }}</dl>
+    {% endfor %}
+    </dl>
+</span>

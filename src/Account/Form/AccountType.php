@@ -1,23 +1,22 @@
 <?php declare(strict_types = 1);
 
-namespace App\Transaction\Form;
+
+namespace App\Account\Form;
+
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SpendMoneyType extends AbstractType
+class AccountType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('title')
-            ->add('amount', MoneyType::class);
+        $builder->add('name');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('data_class',SpendMoneyData::class);
+        $resolver->setDefault('data_class', AccountData::class);
     }
 }

@@ -2,7 +2,6 @@
 
 {% block body %}
     <h1>Habuwi</h1>
-    {{ render(controller('App\\Controller\\SpendMoneyController:add')) }}
-    {{ render(controller('App\\Controller\\SaveMoneyController:add')) }}
-    {{ render(controller('App\\Controller\\AccountInfoController:totalAmount')) }}
+    {{ render(controller('App\\Controller\\FrontendController:transactionForm')) }}
+    {{ render(controller('App\\Controller\\FrontendController:totalAmounts')) }}
 {% endblock %}
