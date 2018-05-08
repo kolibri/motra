@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /** @Route("/transaction", name="api_transaction_") */
 class TransactionController
@@ -55,8 +56,9 @@ class TransactionController
                         'title' => $transaction->getTitle(),
                         'amount' => $transaction->getAmount(),
                         'type' => $transaction->getType(),
+                        'created_at' => $transaction->getCreatedAt(),
                         '_link' => $router->generate('api_transaction_view', ['id' => $transaction->getId()]),
-                        '_self' => $router->generate('api_transaction_list'),
+                        '_delete' => $router->generate('api_transaction_delete', ['id' => $transaction->getId()]),
                     ];
                 },
                 $repository->findAll()
@@ -68,22 +70,16 @@ class TransactionController
     public function listForAccount(
         Account $account,
         TransactionRepository $repository,
-        RouterInterface $router
+        RouterInterface $router,
+        NormalizerInterface $normalizer
     ): JsonResponse
     {
         return new JsonResponse(
             [
                 'transactions' =>
                     array_map(
-                        function (Transaction $transaction) use ($router) {
-                            return [
-                                'id' => $transaction->getId(),
-                                'title' => $transaction->getTitle(),
-                                'amount' => $transaction->getAmount(),
-                                'type' => $transaction->getType(),
-                                '_link' => $router->generate('api_transaction_view', ['id' => $transaction->getId()]),
-                                '_self' => $router->generate('api_transaction_list'),
-                            ];
+                        function (Transaction $transaction) use ($router, $normalizer) {
+                            return $normalizer->normalize($transaction, 'json');
                         },
                         $repository->findAllByAccount($account)
                     ),
@@ -106,7 +102,7 @@ class TransactionController
         );
     }
 
-    /** @Route("/delete/{id}", name="edit", methods={"POST"}) */
+    /** @Route("/delete/{id}", name="delete", methods={"POST"}) */
     public function delete(Transaction $transaction, TransactionRepository $repository): JsonResponse
     {
         $repository->delete($transaction);

@@ -37,7 +37,7 @@ class AccountController
     /** @Route("/add", name="add", methods={"PUT","POST"}) */
     public function add(Request $request, AccountRepository $repository, RouterInterface $router)
     {
-        $data = $request->request->get('account');
+        $data = json_decode($request->getContent(), true);
         $account = new Account($data['name']);
         $repository->add($account);
 

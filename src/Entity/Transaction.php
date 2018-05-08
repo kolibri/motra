@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\UuidInterface;
 
 /** @ORM\Entity() */
 class Transaction
@@ -23,9 +22,10 @@ class Transaction
     private $title;
     /** @ORM\Column() */
     private $type;
-
     /** @ORM\Column(type="integer") */
     private $amount;
+    /** @ORM\Column(type="datetime_immutable") */
+    private $createdAt;
 
     public function __construct(string $title, int $amount, string $type, Account $account)
     {
@@ -33,6 +33,7 @@ class Transaction
         $this->amount = $amount;
         $this->type = $type;
         $this->account = $account;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): int
@@ -58,5 +59,10 @@ class Transaction
     public function getAccount(): Account
     {
         return $this->account;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

@@ -4,11 +4,20 @@
 namespace App\Normalizer;
 
 use App\Entity\Transaction;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class TransactionNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    private $router;
+
+    public function __construct(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
+
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         return new Transaction($data['title'],$data['amount'], $data['type'],$data['account']);
@@ -32,7 +41,10 @@ class TransactionNormalizer implements NormalizerInterface, DenormalizerInterfac
             'title' => $object->getTitle(),
             'amount' => $object->getAmount(),
             'type' => $object->getType(),
-            'account' => $object->getAccount(),
+            'account' => $object->getAccount()->getId(),
+            'created_at' => $object->getCreatedAt(),
+            '_view' => $this->router->generate('api_transaction_view', ['id' => $object->getId()]),
+            '_delete' => $this->router->generate('api_transaction_delete', ['id' => $object->getId()]),
         ];
     }
 
