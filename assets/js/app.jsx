@@ -8,31 +8,15 @@ import {
 } from 'react-router-dom'
 
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentAccount: 1,
-            accounts: [],
-            amount: 0,
-            title: '',
-            loaded: false,
-            error: ''
-        };
-
-        // this.handleInputChange = this.handleInputChange.bind(this);
-        // this.handleSpend = this.handleSpend.bind(this);
-        // this.handleChangeAccount = this.handleChangeAccount.bind(this);
-    }
-
     render() {
         return (
             <div>
                 <Route path="/" component={AccountInfoList}/>
                 <Route path="/account/:id" component={CurrentAccount}/>
                 <Route path="/account/:id" component={TransactionBox}/>
+                <Route path="/account/:id" component={TransactionList}/>
             </div>
         );
-
     }
 }
 
@@ -47,7 +31,6 @@ class AccountInfoList extends React.Component {
     }
 
     componentDidMount() {
-        const a = 0;
         fetch('/api/v1/account/list')
             .then(res => res.json())
             .then(
@@ -131,27 +114,14 @@ class CurrentAccount extends React.Component {
             return <div>Loading ...</div>
         } else {
             return (
-                <div>
                 <div className="current-account">
                     <span className="name">{this.state.name}</span>
                     <span className="total">{this.state.total} €</span>
                 </div>
-                    <form onSubmit={this.handleSpend} className="transaction-box">
-                        <label>Amount
-                            <input type="number" name="amount" value={this.state.amount}
-                                   onChange={this.handleInputChange}/>
-                        </label>
-                        <label>Title
-                            <input type="text" name="title" value={this.state.title} onChange={this.handleInputChange}/>
-                        </label>
-                        <button type="submit" value="spend">Spend</button>
-                    </form>
-                    </div>
             )
         }
     }
 }
-
 
 class TransactionBox extends React.Component {
     constructor(props) {
@@ -164,16 +134,14 @@ class TransactionBox extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSpend = this.handleSpend.bind(this);
     }
+
     render() {
         return (
             <form onSubmit={this.handleSpend} className="transaction-box">
-                <label>Amount
-                    <input type="number" name="amount" value={this.state.amount}
-                           onChange={this.handleInputChange}/>
-                </label>
-                <label>Title
-                    <input type="text" name="title" value={this.state.title} onChange={this.handleInputChange}/>
-                </label>
+                <input type="number" placeholder="Amount" name="amount" value={this.state.amount}
+                       onChange={this.handleInputChange}/>
+                <input type="text" placeholder="Title" name="title" value={this.state.title}
+                       onChange={this.handleInputChange}/>
                 <button type="submit" value="spend">Spend</button>
             </form>
         );
@@ -191,7 +159,7 @@ class TransactionBox extends React.Component {
 
     handleSpend(event) {
         event.preventDefault();
-console.log(this.props);
+        console.log(this.props);
         fetch('/api/v1/transaction/add/' + this.props.match.params.id, {
             method: 'post',
             body: JSON.stringify({
@@ -209,7 +177,53 @@ console.log(this.props);
                     this.setState({isLoaded: true, error});
                 }
             )
-        
+
+    }
+}
+
+class TransactionList extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            transactions: {},
+            isLoaded: false,
+            error: null
+        }
+    }
+
+    componentDidMount() {
+        fetch('/api/v1/transaction/list/' + this.props.match.params.id)
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({isLoaded: true, transactions: result.transactions});
+                },
+                (error) => {
+                    this.setState({isLoaded: true, error});
+                }
+            )
+    }
+
+    render() {
+        if (this.state.error) {
+            return <div>Error loading </div>;
+        } else if (!this.state.isLoaded) {
+            return <div>Loading ...</div>
+        } else {
+            const transactions = this.state.transactions;
+            console.log(this.state);
+            return (
+                <ul className="transaction-list">
+                    {transactions.map((transaction) =>
+                        <li>
+                            <span className="title">{transaction.title}</span>
+                            <span className="amount">{transaction.amount}</span>
+                            <span className="type">{transaction.type}</span>
+                        </li>
+                    )}
+                </ul>
+            )
+        }
     }
 }
 

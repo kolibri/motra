@@ -16,8 +16,12 @@ use Symfony\Component\Routing\RouterInterface;
 class TransactionController
 {
     /** @Route("/add", name="add", methods={"PUT","POST"}) */
-    public function add(Request $request, TransactionRepository $repository, AccountRepository $accountRepository, RouterInterface $router)
-    {
+    public function add(
+        Request $request,
+        TransactionRepository $repository,
+        AccountRepository $accountRepository,
+        RouterInterface $router
+    ) {
         $data = $request->request->get('transaction');
         $account = $accountRepository->findById($data['account']);
         $transaction = new Transaction($data['title'], (int)($data['amount'] * 100), $data['type'], $account);
@@ -27,15 +31,19 @@ class TransactionController
     }
 
     /** @Route("/add/{id}", name="add", methods={"PUT","POST"}) */
-    public function addToAccount(Request $request, Account $account, TransactionRepository $repository, RouterInterface $router)
-    {
+    public function addToAccount(
+        Request $request,
+        Account $account,
+        TransactionRepository $repository,
+        RouterInterface $router
+    ) {
         $data = json_decode($request->getContent(), true);
         $transaction = new Transaction($data['title'], (int)($data['amount'] * 100), $data['type'], $account);
         $repository->add($transaction);
 
         return new RedirectResponse($router->generate('api_index'));
     }
-    
+
     /** @Route("/list", name="list", methods={"GET"}) */
     public function list(TransactionRepository $repository, RouterInterface $router): JsonResponse
     {
@@ -53,6 +61,33 @@ class TransactionController
                 },
                 $repository->findAll()
             )
+        );
+    }
+
+    /** @Route("/list/{id}", name="list_for_account", methods={"GET"}) */
+    public function listForAccount(
+        Account $account,
+        TransactionRepository $repository,
+        RouterInterface $router
+    ): JsonResponse
+    {
+        return new JsonResponse(
+            [
+                'transactions' =>
+                    array_map(
+                        function (Transaction $transaction) use ($router) {
+                            return [
+                                'id' => $transaction->getId(),
+                                'title' => $transaction->getTitle(),
+                                'amount' => $transaction->getAmount(),
+                                'type' => $transaction->getType(),
+                                '_link' => $router->generate('api_transaction_view', ['id' => $transaction->getId()]),
+                                '_self' => $router->generate('api_transaction_list'),
+                            ];
+                        },
+                        $repository->findAllByAccount($account)
+                    ),
+            ]
         );
     }
 
