@@ -1,7 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
+use App\Entity\Account;
 use App\Entity\Transaction;
 use App\Repository\AccountRepository;
 use App\Repository\TransactionRepository;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
-/** @Route("/api/v1/transaction", name="api_transaction_") */
+/** @Route("/transaction", name="api_transaction_") */
 class TransactionController
 {
     /** @Route("/add", name="add", methods={"PUT","POST"}) */
@@ -25,6 +26,16 @@ class TransactionController
         return new RedirectResponse($router->generate('api_transaction_view', ['id' => $transaction->getId()]));
     }
 
+    /** @Route("/add/{id}", name="add", methods={"PUT","POST"}) */
+    public function addToAccount(Request $request, Account $account, TransactionRepository $repository, RouterInterface $router)
+    {
+        $data = json_decode($request->getContent(), true);
+        $transaction = new Transaction($data['title'], (int)($data['amount'] * 100), $data['type'], $account);
+        $repository->add($transaction);
+
+        return new RedirectResponse($router->generate('api_index'));
+    }
+    
     /** @Route("/list", name="list", methods={"GET"}) */
     public function list(TransactionRepository $repository, RouterInterface $router): JsonResponse
     {

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
 use App\Account\AmountCalculator;
 use App\Entity\Account;
@@ -11,22 +11,26 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
-/** @Route("/api/v1/account", name="api_account_") */
+/** @Route("/account", name="api_account_") */
 class AccountController
 {
     /** @Route("/list", name="list", methods={"GET"}) */
     public function list(AccountRepository $repository, AmountCalculator $calculator): JsonResponse
     {
         return new JsonResponse(
-            array_map(
-                function (Account $account) use ($calculator) {
-                    return [
-                        'name' => $account->getName(),
-                        'amount' => $calculator->calculateTotal($account),
-                    ];
-                },
-                $repository->findAll()
-            )
+            [
+                'accounts' =>
+                    array_map(
+                        function (Account $account) use ($calculator) {
+                            return [
+                                'id' => $account->getId(),
+                                'name' => $account->getName(),
+                                'total' => $calculator->calculateTotal($account),
+                            ];
+                        },
+                        $repository->findAll()
+                    ),
+            ]
         );
     }
 
@@ -45,8 +49,9 @@ class AccountController
     {
         return new JsonResponse(
             [
+                'id' => $account->getId(),
                 'name' => $account->getName(),
-                'amount' => $calculator->calculateTotal($account),
+                'total' => $calculator->calculateTotal($account),
                 '_self' => $router->generate('api_account_view', ['id' => $account->getId()]),
             ]
         );

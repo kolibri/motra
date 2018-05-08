@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
     {% set endpoints = [
     {'path': path('api_account_list'), 'name': 'Account List', 'method': 'GET'},
     {'path': path('api_account_add'), 'name': 'Account List', 'method': 'POST', 'body': {'name': 'string'}},
@@ -102,6 +103,7 @@
 {% endblock %}
 
 {% block stylesheets %}
+    {{ parent() }}
 <style>
     .result {
         border: 1px solid black;

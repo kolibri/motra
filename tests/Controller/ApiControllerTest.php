@@ -14,6 +14,9 @@ class ApiControllerTest extends FunctionalTestCase
 
         $this->assertAccountList([], $client);
         $this->assertAddAccount('bar', $client);
+        $this->assertAddAccount('foo', $client);
+        $this->assertAddAccount('baz', $client);
+        $this->assertAddAccount('fuu', $client);
         $this->assertAccountList([['name' => 'bar', 'amount' => 0]], $client);
         $this->assertAddTransaction(100, 'income', 'save', 1, 'bar', $client);
         $this->assertAccountList([['name' => 'bar', 'amount' => 10000]], $client);
@@ -33,7 +36,7 @@ class ApiControllerTest extends FunctionalTestCase
         $client->request('POST', '/api/v1/account/add', ['account' => ['name' => $name]]);
         $this->assertTrue($client->getResponse()->isRedirection());
         $client->followRedirect();
-        $this->assertJsonContent(['name' => $name, 'amount' => 0, '_self' => '/api/v1/account/view/1'], $client);
+        $this->assertJsonContent(['name' => $name, 'amount' => 0], $client);
     }
 
     private function assertAddTransaction(

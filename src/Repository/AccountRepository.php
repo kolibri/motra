@@ -17,6 +17,7 @@ class AccountRepository
         $this->transactionRepository = $transactionRepository;
     }
 
+    /** @return Account[] */
     public function findAll(): array
     {
         return $this->getRepository()->findAll();
