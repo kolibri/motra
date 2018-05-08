@@ -30,7 +30,7 @@ export default class TransactionList extends React.Component {
     }
 
     handleChange(id) {
-        fetch('/api/v1/transaction/list/' + id)
+        fetch('/api/v1/account/' + id)
             .then(res => res.json())
             .then(
                 (result) => {

@@ -16,22 +16,27 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 /** @Route("/transaction", name="api_transaction_") */
 class TransactionController
 {
-    /** @Route("/add", name="add", methods={"PUT","POST"}) */
+    /** @Route("/", name="add", methods={"PUT","POST"}) */
     public function add(
         Request $request,
         TransactionRepository $repository,
         AccountRepository $accountRepository,
         RouterInterface $router
     ) {
-        $data = $request->request->get('transaction');
+        $data = json_decode($request->getContent(), true);
         $account = $accountRepository->findById($data['account']);
-        $transaction = new Transaction($data['title'], (int)($data['amount'] * 100), $data['type'], $account);
-        $repository->add($transaction);
 
-        return new RedirectResponse($router->generate('api_transaction_view', ['id' => $transaction->getId()]));
+        return $this->handleNewTransaction(
+            $repository,
+            $router,
+            $data['title'],
+            (int)($data['amount'] * 100),
+            $data['type'],
+            $account
+        );
     }
 
-    /** @Route("/add/{id}", name="add", methods={"PUT","POST"}) */
+    /** @Route("/add/{id}", name="add_to_account", methods={"PUT","POST"}) */
     public function addToAccount(
         Request $request,
         Account $account,
@@ -39,74 +44,42 @@ class TransactionController
         RouterInterface $router
     ) {
         $data = json_decode($request->getContent(), true);
-        $transaction = new Transaction($data['title'], (int)($data['amount'] * 100), $data['type'], $account);
-        $repository->add($transaction);
 
-        return new RedirectResponse($router->generate('api_index'));
-    }
-
-    /** @Route("/list", name="list", methods={"GET"}) */
-    public function list(TransactionRepository $repository, RouterInterface $router): JsonResponse
-    {
-        return new JsonResponse(
-            array_map(
-                function (Transaction $transaction) use ($router) {
-                    return [
-                        'id' => $transaction->getId(),
-                        'title' => $transaction->getTitle(),
-                        'amount' => $transaction->getAmount(),
-                        'type' => $transaction->getType(),
-                        'created_at' => $transaction->getCreatedAt(),
-                        '_link' => $router->generate('api_transaction_view', ['id' => $transaction->getId()]),
-                        '_delete' => $router->generate('api_transaction_delete', ['id' => $transaction->getId()]),
-                    ];
-                },
-                $repository->findAll()
-            )
+        return $this->handleNewTransaction(
+            $repository,
+            $router,
+            $data['title'],
+            (int)($data['amount'] * 100),
+            $data['type'],
+            $account
         );
     }
 
-    /** @Route("/list/{id}", name="list_for_account", methods={"GET"}) */
-    public function listForAccount(
-        Account $account,
-        TransactionRepository $repository,
-        RouterInterface $router,
-        NormalizerInterface $normalizer
-    ): JsonResponse
+    /** @Route("/{id}", name="view", methods={"GET"}) */
+    public function view(Transaction $transaction, NormalizerInterface $normalizer): JsonResponse
     {
-        return new JsonResponse(
-            [
-                'transactions' =>
-                    array_map(
-                        function (Transaction $transaction) use ($router, $normalizer) {
-                            return $normalizer->normalize($transaction, 'json');
-                        },
-                        $repository->findAllByAccount($account)
-                    ),
-            ]
-        );
+        return new JsonResponse($normalizer->normalize($transaction, 'json'));
     }
 
-    /** @Route("/view/{id}", name="view", methods={"GET"}) */
-    public function view(Transaction $transaction, RouterInterface $router): JsonResponse
-    {
-        return new JsonResponse(
-            [
-                'id' => $transaction->getId(),
-                'title' => $transaction->getTitle(),
-                'amount' => $transaction->getAmount(),
-                'type' => $transaction->getType(),
-                'account' => $transaction->getAccount()->getName(),
-                '_self' => $router->generate('api_transaction_view', ['id' => $transaction->getId()]),
-            ]
-        );
-    }
-
-    /** @Route("/delete/{id}", name="delete", methods={"POST"}) */
+    /** @Route("/{id}", name="delete", methods={"DELETE"}) */
     public function delete(Transaction $transaction, TransactionRepository $repository): JsonResponse
     {
         $repository->delete($transaction);
 
         return new JsonResponse(['deleted' => true]);
+    }
+
+    private function handleNewTransaction(
+        TransactionRepository $repository,
+        RouterInterface $router,
+        string $title,
+        int $amount,
+        string $type,
+        Account $account
+    ) {
+        $transaction = new Transaction($title, $amount, $type, $account);
+        $repository->add($transaction);
+
+        return new RedirectResponse($router->generate('api_transaction_view', ['id' => $transaction->getId()]));
     }
 }

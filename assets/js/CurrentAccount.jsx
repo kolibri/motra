@@ -19,11 +19,11 @@ export default class CurrentAccount extends React.Component {
     }
 
     handleChange(id) {
-        fetch('/api/v1/account/view/' + id)
+        fetch('/api/v1/account/' + id)
             .then(res => res.json())
             .then(
                 (result) => {
-                    this.setState({isLoaded: true, id: result.id, name: result.name, total: result.total});
+                    this.setState({isLoaded: true, id: result.account.id, name: result.account.name, total: result.account.total});
                 },
                 (error) => {
                     this.setState({isLoaded: true, error});

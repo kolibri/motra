@@ -1,31 +1,18 @@
 <?php declare(strict_types = 1);
 
-
 namespace App\Normalizer;
 
 use App\Entity\Transaction;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class TransactionNormalizer implements NormalizerInterface, DenormalizerInterface
+class TransactionNormalizer implements NormalizerInterface
 {
     private $router;
 
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
-    }
-
-
-    public function denormalize($data, $class, $format = null, array $context = array())
-    {
-        return new Transaction($data['title'],$data['amount'], $data['type'],$data['account']);
-    }
-
-    public function supportsDenormalization($data, $type, $format = null)
-    {
-        return Transaction::class === $type;
     }
 
     /**
@@ -48,8 +35,8 @@ class TransactionNormalizer implements NormalizerInterface, DenormalizerInterfac
         ];
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
-        return in_array($format, ['json'], true);
+        return get_class($data) === Transaction::class && in_array($format, ['json'], true);
     }
 }

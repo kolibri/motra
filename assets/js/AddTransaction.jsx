@@ -38,12 +38,13 @@ export default class AddTransaction extends React.Component {
     handleSpend(event) {
         event.preventDefault();
         console.log(this.props);
-        fetch('/api/v1/transaction/add/' + this.props.match.params.id, {
+        fetch('/api/v1/transaction/' + this.props.match.params.id, {
             method: 'post',
             body: JSON.stringify({
                 'title': this.state.title,
                 'amount': this.state.amount,
-                'type': 'spend'
+                'type': 'spend',
+                'account': this.props.match.params.id
             })
         })
             .then(res => res.json())

@@ -12,7 +12,7 @@ export default class AccountInfoList extends React.Component {
     }
 
     componentDidMount() {
-        fetch('/api/v1/account/list')
+        fetch('/api/v1/account')
             .then(res => res.json())
             .then(
                 (result) => {
@@ -38,6 +38,8 @@ export default class AccountInfoList extends React.Component {
                             <span className="name">{account.name}</span>
                             <span className="total">{account.total} €</span>
                         </Link>)}
+
+                    <Link to={{ pathname: "/account/add"}}>Add Account</Link>
                 </div>
             )
         }

@@ -15,9 +15,8 @@ export default class AddAccount extends React.Component {
     render() {
         return (
             <form onSubmit={this.handleAdd} className="transaction-box">
-                <label for="name">
-                    <input type="text" placeholder="Name" name="name" id="name" value={this.state.name}
-                           onChange={this.handleInputChange}/>
+                <label>Name
+                    <input type="text" name="name" value={this.state.name} onChange={this.handleInputChange}/>
                 </label>
                 <button type="submit">Submit</button>
             </form>
@@ -37,7 +36,7 @@ export default class AddAccount extends React.Component {
     handleAdd(event) {
         event.preventDefault();
         console.log(this.props);
-        fetch('/api/v1/account/add', {
+        fetch('/api/v1/account', {
             method: 'post',
             body: JSON.stringify({
                 'name': this.state.name,

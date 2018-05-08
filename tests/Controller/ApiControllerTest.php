@@ -4,6 +4,7 @@ namespace Tests\App\Controller;
 
 use App\Test\FunctionalTestCase;
 use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiControllerTest extends FunctionalTestCase
 {
@@ -17,26 +18,27 @@ class ApiControllerTest extends FunctionalTestCase
         $this->assertAddAccount('foo', $client);
         $this->assertAddAccount('baz', $client);
         $this->assertAddAccount('fuu', $client);
-        $this->assertAccountList([['name' => 'bar', 'amount' => 0]], $client);
-        $this->assertAddTransaction(100, 'income', 'save', 1, 'bar', $client);
-        $this->assertAccountList([['name' => 'bar', 'amount' => 10000]], $client);
-        $this->assertAddTransaction(2.5, 'something', 'spend', 1, 'bar', $client);
-        $this->assertAccountList([['name' => 'bar', 'amount' => 9750]], $client);
+        $this->assertAccountList([['name' => 'bar', 'total' => 0]], $client);
+        $this->assertAddTransaction(100, 'income', 'save', 1, $client);
+        $this->assertAccountList([['name' => 'bar', 'total' => 10000]], $client);
+        $this->assertAddTransaction(2.5, 'something', 'spend', 1, $client);
+        $this->assertAccountList([['name' => 'bar', 'total' => 9750]], $client);
     }
 
     private function assertAccountList(array $expected, Client $client)
     {
-        $client->request('GET', '/api/v1/account/list');
-        $this->assertTrue($client->getResponse()->isSuccessful());
-        $this->assertJsonContent($expected, $client);
+        $client->request('GET', '/api/v1/account');
+        $this->assertTrue($client->getResponse()->isRedirection());
+        $client->followRedirect();
+        $this->assertJsonContent(['accounts' => $expected], $client);
     }
 
     private function assertAddAccount(string $name, Client $client)
     {
-        $client->request('POST', '/api/v1/account/add', ['account' => ['name' => $name]]);
+        $client->request('POST', '/api/v1/account/', [], [], [], json_encode(['name' => $name]));
         $this->assertTrue($client->getResponse()->isRedirection());
         $client->followRedirect();
-        $this->assertJsonContent(['name' => $name, 'amount' => 0], $client);
+        $this->assertJsonContent(['account' => ['name' => $name, 'total' => 0], 'transactions' => []], $client);
     }
 
     private function assertAddTransaction(
@@ -44,21 +46,26 @@ class ApiControllerTest extends FunctionalTestCase
         string $title,
         string $type,
         int $accountId,
-        string $accountName,
         Client $client
     ) {
         $client->request(
             'POST',
-            '/api/v1/transaction/add',
-            [
-                'transaction' => [
+            '/api/v1/transaction/',
+            [],
+            [],
+            [],
+            json_encode(
+                [
                     'amount' => $amount,
                     'title' => $title,
                     'type' => $type,
                     'account' => $accountId,
-                ],
-            ]
+                ]
+            )
         );
+        /** @var Response $response */
+        $response = $client->getResponse();
+        dump($response->getStatusCode());
         $this->assertTrue($client->getResponse()->isRedirection());
         $client->followRedirect();
         $this->assertJsonContent(
@@ -66,7 +73,7 @@ class ApiControllerTest extends FunctionalTestCase
                 'amount' => (int)($amount * 100),
                 'title' => $title,
                 'type' => $type,
-                'account' => $accountName,
+                'account' => $accountId,
             ],
             $client
         );

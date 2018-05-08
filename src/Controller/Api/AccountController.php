@@ -2,31 +2,29 @@
 
 namespace App\Controller\Api;
 
-use App\Account\AmountCalculator;
 use App\Entity\Account;
+use App\Entity\Transaction;
 use App\Repository\AccountRepository;
+use App\Repository\TransactionRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /** @Route("/account", name="api_account_") */
 class AccountController
 {
-    /** @Route("/list", name="list", methods={"GET"}) */
-    public function list(AccountRepository $repository, AmountCalculator $calculator): JsonResponse
+    /** @Route("/", name="list", methods={"GET"}) */
+    public function list(AccountRepository $repository, NormalizerInterface $normalizer): JsonResponse
     {
         return new JsonResponse(
             [
                 'accounts' =>
                     array_map(
-                        function (Account $account) use ($calculator) {
-                            return [
-                                'id' => $account->getId(),
-                                'name' => $account->getName(),
-                                'total' => $calculator->calculateTotal($account),
-                            ];
+                        function (Account $account) use ($normalizer) {
+                            return $normalizer->normalize($account, 'json');
                         },
                         $repository->findAll()
                     ),
@@ -34,7 +32,7 @@ class AccountController
         );
     }
 
-    /** @Route("/add", name="add", methods={"PUT","POST"}) */
+    /** @Route("/", name="add", methods={"PUT","POST"}) */
     public function add(Request $request, AccountRepository $repository, RouterInterface $router)
     {
         $data = json_decode($request->getContent(), true);
@@ -44,15 +42,18 @@ class AccountController
         return new RedirectResponse($router->generate('api_account_view', ['id' => $account->getId()]));
     }
 
-    /** @Route("/view/{id}", name="view", methods={"GET"}) */
-    public function view(Account $account, AmountCalculator $calculator, RouterInterface $router)
+    /** @Route("/{id}", name="view", methods={"GET"}) */
+    public function view(Account $account, TransactionRepository $repository, NormalizerInterface $normalizer)
     {
         return new JsonResponse(
             [
-                'id' => $account->getId(),
-                'name' => $account->getName(),
-                'total' => $calculator->calculateTotal($account),
-                '_self' => $router->generate('api_account_view', ['id' => $account->getId()]),
+                'account' => $normalizer->normalize($account, 'json'),
+                'transactions' => array_map(
+                    function (Transaction $transaction) use ($normalizer) {
+                        return $normalizer->normalize($transaction, 'json');
+                    },
+                    $repository->findAllByAccount($account)
+                ),
             ]
         );
     }
