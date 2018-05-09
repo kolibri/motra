@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom'
 
 export default class AddTransaction extends React.Component {
     constructor(props) {
@@ -37,14 +36,14 @@ export default class AddTransaction extends React.Component {
 
     handleSpend(event) {
         event.preventDefault();
-        console.log(this.props);
-        fetch('/api/v1/transaction/' + this.props.match.params.id, {
+
+        fetch('/api/v1/transaction/', {
             method: 'post',
             body: JSON.stringify({
                 'title': this.state.title,
                 'amount': this.state.amount,
                 'type': 'spend',
-                'account': this.props.match.params.id
+                'account': this.props.account.id
             })
         })
             .then(res => res.json())
@@ -56,5 +55,7 @@ export default class AddTransaction extends React.Component {
                     this.setState({isLoaded: true, error});
                 }
             )
+        console.log(this);
+        this.props.handleSubmit(this.props.account.id);
     }
 }
