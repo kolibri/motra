@@ -1,19 +1,34 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+$color-blue: #121b59;
+$color-mint: #36a97a;
+$color-grey: #7799b6;
+$color-beige: #b19b80;
+$color-red: #ac3d1f;
+
 body {
-    //background-color: #1310D0;
+  background-color: $color-blue;
+  color: $color-grey;
+  font-family: 'Open Sans', sans-serif;
+}
+
+a {
+  color: $color-grey;
+  text-decoration: none;
 }
 
 /* Smartphones (portrait and landscape) ----------- */
-@media only screen and (min-device-width : 360px) and (max-device-width : 480px) {
+@media only screen and (min-device-width: 360px) and (max-device-width: 480px) {
   /* Styles */
 }
 
 /* Smartphones (landscape) ----------- */
-@media only screen and (min-width : 361px) {
+@media only screen and (min-width: 361px) {
   /* Styles */
 }
 
 /* Smartphones (portrait) ----------- */
-@media only screen and (max-width : 360px) {
+@media only screen and (max-width: 360px) {
   /* Styles */
   .account-list {
     width: 100%;
@@ -25,14 +40,15 @@ body {
     overflow: auto;
     white-space: nowrap;
 
-    >span {
+    > a {
       display: inline-block;
       width: 30vw;
       height: 30vw;
       text-align: center;
+      border: solid 0.1em $color-grey;
 
-      .name,
-      .total {
+      > .name,
+      > .total {
         display: block;
         width: 100%;
       }
@@ -42,13 +58,13 @@ body {
   .current-account {
     height: 5vh;
     min-height: 2em;
-    background-color: #1b6d85;
+    background-color: $color-mint;
+    color: $color-blue;
 
     .total {
       float: right;
     }
   }
-
 
   /*
   #navigation {
@@ -61,26 +77,26 @@ body {
 }
 
 /* iPads (portrait and landscape) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
   /* Styles */
 }
 
 /* iPads (landscape) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
   /* Styles */
 }
 
 /* iPads (portrait) ----------- */
-@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait) {
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
   /* Styles */
 }
 
 /* Desktops and laptops ----------- */
-@media only screen  and (min-width : 1224px) {
+@media only screen and (min-width: 1224px) {
   /* Styles */
 }
 
 /* Large screens ----------- */
-@media only screen  and (min-width : 1824px) {
+@media only screen and (min-width: 1824px) {
   /* Styles */
 }
