@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
 
+import MoneyAmount from './MoneyAmount.jsx';
+
 export default class AccountInfoList extends React.Component {
     constructor(props) {
         super(props)
@@ -36,7 +38,7 @@ export default class AccountInfoList extends React.Component {
                     {accounts.map((account) =>
                         <Link to={{ pathname: "/account/view/" + account.id }} key={account.name}>
                             <span className="name">{account.name}</span>
-                            <span className="total">{account.total} €</span>
+                            <MoneyAmount amount={account.total} />
                         </Link>)}
 
                     <Link to={{ pathname: "/account/add"}}>Add Account</Link>

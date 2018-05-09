@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
+import MoneyAmount from './MoneyAmount.jsx';
 
 export default class CurrentAccount extends React.Component {
     constructor(props) {
@@ -54,7 +55,7 @@ export default class CurrentAccount extends React.Component {
             return (
                 <div className="current-account">
                     <span className="name">{this.state.name}</span>
-                    <span className="total">{this.state.total} €</span>
+                    <MoneyAmount amount={this.state.total} />
                 </div>
             )
         }

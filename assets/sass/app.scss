@@ -66,14 +66,38 @@ a {
     }
   }
 
-  /*
-  #navigation {
-    display: none;
+  ul.transaction-list {
+    list-style: none;
+    padding: 0;
+    > li {
+      width: 100%;
+      clear: both;
+      > .amount {
+        float: right;
+      }
+    }
+
+    > li > .title:before {
+      width: 4em;
+      display: inline-block;
+    }
+    > li.save > .title:before {
+      content: 'save';
+      color: $color-mint;
+    }
+    > li.spend > .title:before {
+      content: 'spend';
+      color: $color-red;
+    }
   }
-  #navigation:target {
-    display: block;
+
+  .add-transaction {
+    button {
+      background-color: $color-grey;
+      color: $color-blue;
+    }
   }
-  */
+
 }
 
 /* iPads (portrait and landscape) ----------- */

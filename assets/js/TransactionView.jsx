@@ -2,11 +2,16 @@ import React from 'react';
 import {Link} from 'react-router-dom'
 import MoneyAmount from './MoneyAmount.jsx';
 
-export default class TransactionList extends React.Component {
+export default class TransactionView extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            transactions: {},
+            title: '',
+            id: '',
+            amount: '',
+            type: '',
+            accountId: '',
+            timestamp: '',
             isLoaded: false,
             error: null
         }
@@ -31,11 +36,19 @@ export default class TransactionList extends React.Component {
     }
 
     handleChange(id) {
-        fetch('/api/v1/account/' + id)
+        fetch('/api/v1/transaction/' + id)
             .then(res => res.json())
             .then(
                 (result) => {
-                    this.setState({isLoaded: true, transactions: result.transactions});
+                    this.setState({
+                        isLoaded: true,
+                        title: result.title,
+                        id: result.id,
+                        amount: result.amount,
+                        type: result.type,
+                        accountId: result.accountId,
+                        timestamp: result.timestamp
+                    });
                 },
                 (error) => {
                     this.setState({isLoaded: true, error});
@@ -49,21 +62,13 @@ export default class TransactionList extends React.Component {
         } else if (!this.state.isLoaded) {
             return <div>Loading ...</div>
         } else {
-            const transactions = this.state.transactions;
             return (
-                <ul className="transaction-list">
-                    {transactions.map((transaction) =>
-                        <li className={transaction.type}>
-                            <span className="title">
-                                <Link to={{ pathname: "/transaction/view/" + transaction.id }}>
-                                    {transaction.title}
-                                </Link>
-                            </span>
-                            <MoneyAmount amount={transaction.amount}/>
-
-                        </li>
-                    )}
-                </ul>
+                <div className="transaction-view">
+                    <span class="title">{this.state.title}</span>
+                    <MoneyAmount amount={this.state.amount}/>
+                    <span class="type">{this.state.type}</span>
+                    <span class="accountId">{this.state.accountId}</span>
+                </div>
             )
         }
     }

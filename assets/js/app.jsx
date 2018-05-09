@@ -12,6 +12,7 @@ import CurrentAccount from './CurrentAccount.jsx';
 import AddTransaction from './AddTransaction.jsx';
 import TransactionList from './TransactionList.jsx';
 import AddAccount from './AddAccount.jsx';
+import TransactionView from './TransactionView.jsx';
 
 class App extends React.Component {
     render() {
@@ -22,6 +23,7 @@ class App extends React.Component {
                 <Route path="/account/view/:id" component={AddTransaction}/>
                 <Route path="/account/view/:id" component={TransactionList}/>
                 <Route path="/account/add" component={AddAccount}/>
+                <Route path="/transaction/view/:id" component={TransactionView}/>
             </div>
         );
     }

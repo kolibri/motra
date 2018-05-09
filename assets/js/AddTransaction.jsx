@@ -15,7 +15,7 @@ export default class AddTransaction extends React.Component {
 
     render() {
         return (
-            <form onSubmit={this.handleSpend} className="transaction-box">
+            <form onSubmit={this.handleSpend} className="add-transaction">
                 <input type="number" placeholder="Amount" name="amount" value={this.state.amount}
                        onChange={this.handleInputChange}/>
                 <input type="text" placeholder="Title" name="title" value={this.state.title}
