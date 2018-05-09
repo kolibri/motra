@@ -1,5 +1,6 @@
 import React from 'react';
 import {Link} from 'react-router-dom'
+import DateView from './DateView.jsx';
 import MoneyAmount from './MoneyAmount.jsx';
 
 export default class TransactionView extends React.Component {
@@ -11,7 +12,7 @@ export default class TransactionView extends React.Component {
             amount: '',
             type: '',
             accountId: '',
-            timestamp: '',
+            createdAt: '',
             isLoaded: false,
             error: null
         }
@@ -46,8 +47,8 @@ export default class TransactionView extends React.Component {
                         id: result.id,
                         amount: result.amount,
                         type: result.type,
-                        accountId: result.accountId,
-                        timestamp: result.timestamp
+                        account: result.account,
+                        createdAt: result.created_at
                     });
                 },
                 (error) => {
@@ -64,10 +65,11 @@ export default class TransactionView extends React.Component {
         } else {
             return (
                 <div className="transaction-view">
-                    <span class="title">{this.state.title}</span>
+                    <span className="title">{this.state.title}</span>
                     <MoneyAmount amount={this.state.amount}/>
-                    <span class="type">{this.state.type}</span>
-                    <span class="accountId">{this.state.accountId}</span>
+                    <span className="type">{this.state.type}</span>
+                    <span className="account">{this.state.account.name}</span>
+                    <DateView date={this.state.createdAt} />
                 </div>
             )
         }

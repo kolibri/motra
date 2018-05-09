@@ -4,10 +4,13 @@ namespace App\Normalizer;
 
 use App\Entity\Transaction;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class TransactionNormalizer implements NormalizerInterface
+class TransactionNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
+    use NormalizerAwareTrait;
     private $router;
 
     public function __construct(RouterInterface $router)
@@ -28,8 +31,8 @@ class TransactionNormalizer implements NormalizerInterface
             'title' => $object->getTitle(),
             'amount' => $object->getAmount(),
             'type' => $object->getType(),
-            'account' => $object->getAccount()->getId(),
-            'created_at' => $object->getCreatedAt(),
+            'account' => $this->normalizer->normalize($object->getAccount(), $format),
+            'created_at' => $object->getCreatedAt()->format(\DateTime::ISO8601),
             '_view' => $this->router->generate('api_transaction_view', ['id' => $object->getId()]),
             '_delete' => $this->router->generate('api_transaction_delete', ['id' => $object->getId()]),
         ];

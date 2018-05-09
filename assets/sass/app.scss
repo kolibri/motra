@@ -98,6 +98,32 @@ a {
     }
   }
 
+  .transaction-view {
+    > span {
+      display: block;
+    }
+    > span:before {
+      display: block;
+      float: left;
+      width: 5em;
+    }
+
+    > span.title:before {
+      content: 'Title:';
+    }
+    > span.amount:before {
+      content: 'Amount:';
+    }
+    > span.type:before {
+      content: 'Type:';
+    }
+    > span.account:before {
+      content: 'Account:';
+    }
+    > span.date:before {
+      content: 'Date:';
+    }
+  }
 }
 
 /* iPads (portrait and landscape) ----------- */
