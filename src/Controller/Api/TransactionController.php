@@ -7,13 +7,18 @@ use App\Entity\Transaction;
 use App\Repository\AccountRepository;
 use App\Repository\TransactionRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/** @Route("/transaction", name="api_transaction_") */
+/**
+ * @Route("/transaction", name="api_transaction_")
+ *@Security("has_role('ROLE_USER')")
+ */
 class TransactionController
 {
     /** @Route("/", name="add", methods={"PUT","POST"}) */
@@ -21,10 +26,28 @@ class TransactionController
         Request $request,
         TransactionRepository $repository,
         AccountRepository $accountRepository,
-        RouterInterface $router
+        RouterInterface $router,
+        ValidatorInterface $validator
     ) {
         $data = json_decode($request->getContent(), true);
-        $account = $accountRepository->findById($data['account']);
+        $transaction = $accountRepository->findById($data['account']);
+
+        $violations = $validator->validate($transaction);
+
+        if (0 < count($violations)) {
+            dump($violations);
+
+            return new JsonResponse(
+                [
+                    'errors' => array_map(
+                        function ($violation) {
+                            return $violation->getMessage();
+                        },
+                        $violations
+                    ),
+                ]
+            );
+        }
 
         return $this->handleNewTransaction(
             $repository,
@@ -32,7 +55,7 @@ class TransactionController
             $data['title'],
             (int)($data['amount'] * 100),
             $data['type'],
-            $account
+            $transaction
         );
     }
 
@@ -80,6 +103,6 @@ class TransactionController
         $transaction = new Transaction($title, $amount, $type, $account);
         $repository->add($transaction);
 
-        return new RedirectResponse($router->generate('api_transaction_view', ['id' => $transaction->getId()]));
+        return new JsonResponse([], 201, ['Location' => $router->generate('api_transaction_view', ['id' => $transaction->getId()])]);
     }
 }

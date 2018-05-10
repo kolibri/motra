@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** @ORM\Entity() */
 class Account
@@ -15,7 +15,10 @@ class Account
      */
     private $id;
 
-    /** @ORM\Column() */
+    /**
+     * @ORM\Column()
+     * @Assert\NotBlank()
+     */
     private $name;
 
     public function __construct(string $name)

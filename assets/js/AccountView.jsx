@@ -22,7 +22,11 @@ export default class AccountView extends React.Component {
     }
 
     handleChange(id) {
-        fetch('/api/v1/account/' + id)
+        fetch('/api/v1/account/' + id, {
+            headers: {
+                Authorization: 'Basic ' + btoa("torben@tester.foo:tester")
+            }
+        })
             .then(res => res.json())
             .then(
                 (result) => {

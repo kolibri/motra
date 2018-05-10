@@ -7,13 +7,17 @@ use App\Entity\Transaction;
 use App\Repository\AccountRepository;
 use App\Repository\TransactionRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/** @Route("/account", name="api_account_") */
+/**
+ * @Route("/account", name="api_account_")
+ * @Security("has_role('ROLE_USER')")
+ */
 class AccountController
 {
     /** @Route("/", name="list", methods={"GET"}) */

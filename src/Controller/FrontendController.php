@@ -9,7 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FrontendController extends Controller
 {
-    /** @Route("/{current}", name="home", requirements={"current": ".*"}, methods={"GET"}) */
+    /** 
+     * @Route("/", name="home", methods={"GET"})
+     * @Route("/app/{current}", name="home_app", requirements={"current": ".*"}, methods={"GET"}) 
+     */
     public function home(AccountRepository $repository): Response
     {
         return $this->render('home.html.twig', ['accounts' => $repository->findAll()]);

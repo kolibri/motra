@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** @ORM\Entity() */
 class Transaction
@@ -16,13 +17,25 @@ class Transaction
      * @ORM\Column(type="integer")
      */
     private $id;
-    /** @ORM\ManyToOne(targetEntity="Account") */
+    /**
+     * @ORM\ManyToOne(targetEntity="Account")
+     * @Assert\Valid()
+     */
     private $account;
-    /** @ORM\Column() */
+    /**
+     * @ORM\Column()
+     * @Assert\NotBlank()
+     */
     private $title;
-    /** @ORM\Column() */
+    /**
+     * @ORM\Column()
+     * @Assert\Choice({"save", "spend"})
+     */
     private $type;
-    /** @ORM\Column(type="integer") */
+    /**
+     * @ORM\Column(type="integer")
+     * @Assert\Range(min=0)
+     */
     private $amount;
     /** @ORM\Column(type="datetime_immutable") */
     private $createdAt;
